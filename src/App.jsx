@@ -8,15 +8,10 @@ import TicketCard from "./components/TicketCard";
 
 const App = () => {
   const [step, setStep] = useState(1);
-  const initialFormData = useRef(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load saved data from localStorage only once on component mount
-  useEffect(() => {
-    const savedFormData = localStorage.getItem("ticketFormData");
-    if (savedFormData) {
-      initialFormData.current = JSON.parse(savedFormData);
-    }
-  }, []);
+  const initialFormData = useRef(null);
+  const isInitialMount = useRef(true);
 
   // Validation schema for the form
   const validationSchema = Yup.object({
@@ -37,7 +32,7 @@ const App = () => {
 
   // Initialize form with Formik
   const formik = useFormik({
-    initialValues: initialFormData.current || {
+    initialValues: {
       fullName: "",
       email: "",
       avatarUrl: "",
@@ -53,12 +48,58 @@ const App = () => {
     enableReinitialize: true,
   });
 
-  // Save form data to localStorage whenever values change
   useEffect(() => {
+    const initializeApp = () => {
+      const savedStep = localStorage.getItem("currentStep");
+      const savedFormData = localStorage.getItem("ticketFormData");
+
+      if (savedFormData) {
+        const parsedData = JSON.parse(savedFormData);
+        initialFormData.current = parsedData;
+        formik.setValues(parsedData, false);
+      }
+
+      if (savedStep) {
+        const parsedStep = parseInt(savedStep);
+        setStep(parsedStep);
+      }
+
+      setIsInitialized(true);
+    };
+
+    initializeApp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    // Save current step
+    localStorage.setItem("currentStep", step);
+
+    // Skip validation on initial load
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (step === 3) {
+      if (!formik.values.ticketType) {
+        setStep(1);
+      } else if (
+        !formik.values.fullName ||
+        !formik.values.email ||
+        !formik.values.avatarUrl
+      ) {
+        setStep(2);
+      }
+    }
+
+    // Save form data when values change
     if (formik.dirty) {
       localStorage.setItem("ticketFormData", JSON.stringify(formik.values));
     }
-  }, [formik.values, formik.dirty]);
+  }, [step, formik.values, formik.dirty, isInitialized]);
 
   // Handle going to the next step
   const handleNextStep = () => {
@@ -95,7 +136,9 @@ const App = () => {
     });
     setStep(1);
     localStorage.removeItem("ticketFormData");
+    localStorage.removeItem("currentStep");
     initialFormData.current = null;
+    isInitialMount.current = true;
   }, [formik]);
 
   // Render the appropriate step
@@ -117,6 +160,10 @@ const App = () => {
         return null;
     }
   };
+
+  if (!isInitialized) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
     <div
