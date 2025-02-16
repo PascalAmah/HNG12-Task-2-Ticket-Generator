@@ -14,32 +14,77 @@ const TicketCard = ({ formData, onReset }) => {
         throw new Error("Ticket element not found");
       }
 
+      // Ensure all images are loaded
+      await Promise.all(
+        Array.from(ticketElement.querySelectorAll("img")).map(
+          (img) =>
+            new Promise((resolve) => {
+              if (img.complete) {
+                resolve();
+              } else {
+                img.onload = resolve;
+                img.onerror = resolve;
+                const currentSrc = img.src;
+                img.src =
+                  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+                setTimeout(() => {
+                  img.src = currentSrc;
+                }, 10);
+              }
+            })
+        )
+      );
+
+      // Use PNG format with higher quality settings
       const dataUrl = await domtoimage.toPng(ticketElement, {
         quality: 1.0,
-        scale: 2,
+        scale: 3,
+        style: {
+          transform: "scale(1)",
+        },
       });
 
-      const link = document.createElement("a");
-      link.download = `techember-ticket-${formData.fullName
-        .replace(/\s+/g, "-")
-        .toLowerCase()}.png`;
-      link.href = dataUrl;
+      // Create a temporary image to force download completion
+      const tempImg = new Image();
+      tempImg.onload = () => {
+        // Create canvas to draw the image
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = tempImg.width;
+        canvas.height = tempImg.height;
+        ctx.drawImage(tempImg, 0, 0);
 
-      document.body.appendChild(link);
-      link.click();
+        const finalDataUrl = canvas.toDataURL("image/png");
 
-      document.body.removeChild(link);
+        // Create proper download link
+        const link = document.createElement("a");
+        link.download = `techember-ticket-${formData.fullName
+          .replace(/\s+/g, "-")
+          .toLowerCase()}.png`;
+        link.href = finalDataUrl;
+        link.target = "_blank";
+
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(finalDataUrl);
+          setIsDownloading(false);
+        }, 100);
+      };
+
+      tempImg.src = dataUrl;
     } catch (error) {
       console.error("Error downloading ticket:", error);
       alert("Failed to download ticket. Please try again.");
-    } finally {
       setIsDownloading(false);
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto text-center">
-      <h2 className="text-3xl font-bold mb-4 text-white">
+      <h2 className="text-2xl font-bold mb-4 text-white">
         Your Ticket is Booked!
       </h2>
       <p className="mb-8 text-white">
@@ -65,7 +110,7 @@ const TicketCard = ({ formData, onReset }) => {
 
           {/* Ticket Content */}
           <div className="relative z-10 w-[300px] mx-auto">
-            <div className="mx-auto w-[260px] h-[450px] border border-teal-500 rounded-lg px-3 py-5 mt-5 mb-5 text-center">
+            <div className="mx-auto w-[82%] h-[450px] border border-teal-500 rounded-2xl px-3 py-5 mt-5 mb-5 text-center">
               <h2 className="text-xl font-bold mb-4 text-white">
                 Techember Fest &apos;25
               </h2>
