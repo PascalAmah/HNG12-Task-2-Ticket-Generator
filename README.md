@@ -1,4 +1,4 @@
-# Tiez - Event Ticket Booking App
+# Event Ticket Generator App
 
 A modern React application for booking event tickets with a multi-step form process and persistent state management.
 
