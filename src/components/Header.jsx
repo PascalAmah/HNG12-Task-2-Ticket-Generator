@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,22 +30,22 @@ const Header = () => {
       }
     `}
     >
-      <div className="logo">
+      <Link to="/" className="logo">
         <img src="/tiez-logo.svg" alt="Tiez Logo" className="h-10" />
-      </div>
+      </Link>
       <nav className="hidden md:flex">
-        <a
-          href="#"
+        <Link
+          to="/"
           className="mx-4 text-gray-100 hover:text-teal-400 transition-colors"
         >
           Events
-        </a>
-        <a
-          href="#"
+        </Link>
+        <Link
+          to="/my-tickets"
           className="mx-4 text-gray-100 hover:text-teal-400 transition-colors"
         >
           My Tickets
-        </a>
+        </Link>
         <a
           href="#"
           className="mx-4 text-gray-100 hover:text-teal-400 transition-colors"
@@ -51,7 +53,10 @@ const Header = () => {
           About Project
         </a>
       </nav>
-      <button className="border border-teal-500 bg-white text-black hover:bg-teal-500 hover:text-gray-900 py-2 px-4 rounded-lg font-medium transition-all">
+      <button
+        onClick={() => navigate("/my-tickets")}
+        className="border border-teal-500 bg-white text-black hover:bg-teal-500 hover:text-gray-900 py-2 px-4 rounded-lg font-medium transition-all"
+      >
         MY TICKETS →
       </button>
     </header>

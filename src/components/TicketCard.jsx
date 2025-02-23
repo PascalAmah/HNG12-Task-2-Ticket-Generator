@@ -138,13 +138,31 @@ const TicketCard = ({ formData, onReset }) => {
                 <div className="grid grid-cols-2 gap-3 max-w-md mx-auto text-left">
                   <div>
                     <p className="text-xs text-gray-400">Name</p>
-                    <p className="text-xs text-white">{formData.fullName}</p>
+                    <div className="relative group">
+                      <p
+                        className="text-xs text-white truncate"
+                        title={formData.fullName}
+                      >
+                        {formData.fullName}
+                      </p>
+                      <span className="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-1 bg-gray-900 text-white px-2 py-1 text-xs rounded whitespace-nowrap z-50 mb-1">
+                        {formData.fullName}
+                      </span>
+                    </div>
                   </div>
                   <div>
                     <p className="text-xs text-gray-400">Email</p>
-                    <p className="text-xs text-white overflow-hidden">
-                      {formData.email}
-                    </p>
+                    <div className="relative group">
+                      <p
+                        className="text-xs text-white truncate"
+                        title={formData.email}
+                      >
+                        {formData.email}
+                      </p>
+                      <span className="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-1 bg-gray-900 text-white px-2 py-1 text-xs rounded whitespace-nowrap z-50 mb-1">
+                        {formData.email}
+                      </span>
+                    </div>
                   </div>
                   <div>
                     <p className="text-xs text-gray-400">Ticket Type</p>

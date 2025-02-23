@@ -112,10 +112,9 @@ const AttendeeForm = ({ formik, onNext, onBack }) => {
             </div>
           )}
         </div>
-
         <div className="relative mb-6">
           <label htmlFor="email" className="block text-white text-lg mb-2">
-            Enter your email *
+            Enter your email
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -136,7 +135,6 @@ const AttendeeForm = ({ formik, onNext, onBack }) => {
             <div className="text-red-500 mt-1">{formik.errors.email}</div>
           )}
         </div>
-
         <div className="mb-6">
           <label htmlFor="specialRequest" className="block mb-2 font-medium">
             Special request?
@@ -144,12 +142,16 @@ const AttendeeForm = ({ formik, onNext, onBack }) => {
           <textarea
             id="specialRequest"
             name="specialRequest"
+            maxLength={70}
             className="w-full px-4 py-3 border border-[#07373F] rounded-lg text-white focus:outline-none focus:border-[#24A0B5] transition-all min-h-[100px] resize-y"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.specialRequest}
           />
-        </div>
+          <div className="text-gray-400 text-sm mt-1">
+            {formik.values.specialRequest?.length || 0}/70 characters
+          </div>
+        </div>{" "}
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between mt-8 gap-4 sm:gap-0">
